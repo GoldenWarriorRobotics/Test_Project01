@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 //hellooo
 //hi guys 
+//comment on main
 
 /**
  * Do NOT add any static variables to this class, or any initialization at all. Unless you know what
