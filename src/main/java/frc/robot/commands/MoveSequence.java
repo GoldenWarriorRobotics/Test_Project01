@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class MoveSequence extends CommandGroup {
   /** Add your docs here. */
   public MoveSequence() {
-    addSequential(new Move(2, .5, .5));
+    addSequential(new Move(2, .5, .5)); // how do we make this .3 percent of the motors like aneesh said?
     addSequential(new Move(5, -0.7, -0.7));
     addSequential(new Move(10, -1, 1));
+    // isnt this the autonomous code to get the motors to run 
+    
     // Add Commands here:
     // e.g. addSequential(new Command1());
     // addSequential(new Command2());

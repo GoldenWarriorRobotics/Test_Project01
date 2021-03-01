@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import frc.robot.commands.MoveSequence;
 import frc.robot.subsystems.DriveTrain;
 
 
@@ -31,6 +32,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {// happens when the code starts
     m_oi = new OI();
+    //you have to initalize the autonomous command 
+    m_autonomousCommand = new MoveSequence();
+
    
   }
 
@@ -68,7 +72,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-  
+   if (m_autonomousCommand != null) m_autonomousCommand.start();
+//you need this to start the autonomous command 
+
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
