@@ -3,15 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-// new comment added
+
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+//import frc.robot.commands.MoveSequence;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Shooter;
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,23 +24,32 @@ import frc.robot.subsystems.ExampleSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static ExampleSubsystem m_subsystem = new ExampleSubsystem();
-  public static OI m_oi;
-  // new comment added
+ // private static CANSparkMax motorLeft1 = new CANSparkMax(RobotMap.Motor_LEFT_1_ID, MotorType.kBrushed);
+ private static CANSparkMax motorLeft2 = new CANSparkMax(RobotMap.Motor_LEFT_2_ID, MotorType.kBrushed);
+ // private static CANSparkMax motorRight1 = new CANSparkMax(RobotMap.Motor_RIGHT_1_ID, MotorType.kBrushed);
+  //private static CANSparkMax motorRight2 = new CANSparkMax(RobotMap.Motor_RIGHT_2_ID, MotorType.kBrushed);
+  //public static DriveTrain driveTrain = new DriveTrain(motorLeft1, motorLeft2, motorRight1, motorRight2);
+  public static VictorSPX motorShooter1 = new VictorSPX(RobotMap.Motor_Shooter_1);
+  public static VictorSPX motorShooter2 = new VictorSPX(RobotMap.Motor_Shooter_2);
+  public static Shooter shooter = new Shooter(motorShooter1, motorShooter2);
 
-  Command m_autonomousCommand;
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+ 
+  //public static OI m_oi;
+
+ Command m_autonomousCommand;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
-  public void robotInit() {
-    m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
-    // chooser.addOption("My Auto", new MyAutoCommand());
-    SmartDashboard.putData("Auto mode", m_chooser);
+  public void robotInit() {// happens when the code starts
+   // m_oi = new OI();
+    //you have to initalize the autonomous command 
+   // m_autonomousCommand = new MoveSequence();
+
+   
   }
 
   /**
@@ -47,7 +60,7 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {} // happwens regardless of in telop or autonomous
 
   /**
    * This function is called once each time the robot enters Disabled mode. You can use it to reset
@@ -58,7 +71,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    Scheduler.getInstance().run();
+    Scheduler.getInstance().run(); //very important..tells the code to run it
   }
 
   /**
@@ -73,7 +86,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_chooser.getSelected();
+   if (m_autonomousCommand != null) m_autonomousCommand.start();
+   motorLeft2.set(.3);
+
+   //Scheduler.getInstance();
+//you need this to start the autonomous command 
+
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -83,9 +101,8 @@ public class Robot extends TimedRobot {
      */
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.start();
-    }
+    
+    
   }
 
   /** This function is called periodically during autonomous. */
@@ -100,9 +117,8 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+    
+    
   }
 
   /** This function is called periodically during operator control. */
