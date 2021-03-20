@@ -4,17 +4,38 @@
 
 package frc.robot;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.EncoderType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Shooter;
 
 
 /**
@@ -24,17 +45,49 @@ import frc.robot.subsystems.DriveTrain;
  * project.
  */
 public class Robot extends TimedRobot {
+  private static CANSparkMaxLowLevel motorLeft1 = new CANSparkMax (RobotMap.leftMaster, MotorType.kBrushed);
+  private static CANSparkMaxLowLevel motorLeft2 = new CANSparkMax(RobotMap.leftFollower, MotorType.kBrushed);
+  private static CANSparkMaxLowLevel motorRight1 = new CANSparkMax(RobotMap.rightMaster, MotorType.kBrushed);
+  private static CANSparkMaxLowLevel motorRight2 = new CANSparkMax(RobotMap.rightFollower, MotorType.kBrushed);
 
+  //private CANEncoder m_encoder;
+ // private CANEncoder m_encoder2;
+  private Encoder encoder  = new Encoder(0,1,true,EncodingType.k1X);
+  
+
+  private final double kDriveTick2Feet = 1.0/4096*6*Math.PI/12;
+  
+
+  public Joystick stick; 
+ 
   
   
  
   public static DriveTrain driveTrain = new DriveTrain();
+
+  public static VictorSPX motorShooter1 = new VictorSPX(RobotMap.Motor_Shooter_1);
+  public static VictorSPX motorShooter2 = new VictorSPX(RobotMap.Motor_Shooter_2);
+  public static Shooter shooter = new Shooter(motorShooter1, motorShooter2);
+  
   public static OI m_oi;
 
+  /**public Command getAutonomousCommand() {
+    TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(2), Units.feetToMeters(2)); // 2 feet per second
+    config.setKinematics(driveTrain.getKinematics());**/
+
+   
+    //Trajectory trajectory = TrajectoryGenerator.generateTrajectory(Arrays.asList(new Pose2d(),new Pose2d(1.0,0,new Rotation2d())), config);
+
+   /**  RamseteCommand command = new RamseteCommand(trajectory,driveTrain::getPose,new RamseteController(2.0, 0.7),driveTrain.getFeedforward(),driveTrain.getKinematics(),driveTrain::getSpeeds,
+    driveTrain.getLeftPIDController(),driveTrain.getRightPIDController(),driveTrain::setOutput,driveTrain);
+    return command;
+  }**/
 
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
+  public static frc.robot.subsystems.Intake Intake = new frc.robot.subsystems.Intake();
+ // private double startTime;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -46,6 +99,18 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
+   // motorLeft1 = new CANSparkMax(RobotMap.leftMaster, MotorType.kBrushed);
+    //motorRight1 = new CANSparkMax(RobotMap.rightMaster, MotorType.kBrushed);
+    
+    //motorLeft1.restoreFactoryDefaults();
+    //motorRight2.restoreFactoryDefaults();
+
+  //  m_encoder = motorLeft1.getEncoder(EncoderType.kQuadrature,4096);
+   // m_encoder2 = motorRight1.getEncoder(EncoderType.kQuadrature, 4096);
+
+    
+    
+    //container = new RobotContainer();
   }
 
   /**
@@ -56,7 +121,11 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putNumber("encoder value", encoder.get()*kDriveTick2Feet);
+   // SmartDashboard.putNumber("Left Drive Encoder Value", m_encoder.getPosition());
+    //SmartDashboard.putNumber("Right Drive Encoder Value", m_encoder2.getPosition());
+  }
 
   /**
    * This function is called once each time the robot enters Disabled mode. You can use it to reset
@@ -83,6 +152,15 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_chooser.getSelected();
+    //startTime = Timer.getFPGATimestamp();
+    encoder.reset();
+    errorSum = 0;
+    lastTimeStamp = Timer.getFPGATimestamp();
+    lastError =0;
+
+    // ok motorLeft1.restoreFactoryDefaults();
+  // ok  motorRight2.restoreFactoryDefaults();
+    //Container.getAutonomousCommand().schedule();
    // .set(.3);
 
     /*
@@ -97,12 +175,73 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.start();
     }
   }
+  double setPoint =0;
+  double errorSum = 0;
+  double lastTimeStamp = 0;
+  final  double kP = 0.05;
+  final double kI = 0;
+  final double iLimit = 1;
+  final double kD = 0.01;
+   double lastError =0;
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    Scheduler.getInstance().run();
+    if(stick.getRawButton(1)) {
+      setPoint = 10;
+    }else if (stick.getRawButton(2)){
+      setPoint = 0;
+    }
+    //get sensor posistion
+    double sensorPosition =encoder.get() * kDriveTick2Feet;
+
+    //calculations
+    double error = setPoint -sensorPosition;
+    double outputSpeed = kP * error;
+    double dt = Timer.getFPGATimestamp() - lastTimeStamp;
+
+    if(Math.abs(error) <iLimit) {
+      errorSum += error *dt;
+    }
+
+    double errorRate = (error - lastError) / dt;
+    double outSpeed = kP * error +kI * errorSum +kD *errorRate;
+    //output to motors
+    motorLeft1.set(outputSpeed);
+    motorLeft2.set(outputSpeed);
+    motorRight1.set(-outputSpeed);
+    motorRight2.set(-outputSpeed); 
+    lastTimeStamp = Timer.getFPGATimestamp();
+    lastError = error;
   }
+   /**  double time = Timer.getFPGATimestamp();
+    if (time -startTime <3) {
+    motorLeft1.set(.6);
+    motorLeft2.set(.6);
+    motorRight1.set(.6);
+    motorRight2.set(.6);
+    } else{
+      motorLeft1.set(0);
+      motorLeft2.set(0);
+      motorRight1.set(0);
+      motorRight2.set(0);
+
+    }
+
+    double leftPosition = m_encoder.getPosition() * kDriveTick2Feet;
+    double rightPosition = m_encoder2.getPosition()*kDriveTick2Feet;
+    double distance = (leftPosition+rightPosition)/2;
+
+    if(distance < 10){
+      driveTrain.moveDriveTrain(0.6,0.6);
+
+
+    }else {
+      driveTrain.moveDriveTrain(0, 0);        
+    }
+   
+    Scheduler.getInstance().run();
+  }**/
 
   @Override
   public void teleopInit() {

@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Encoder;
+
 /**
- * The RobotMap is a mapping from the ports sensors and actuators are wired into to a variable name.
- * This provides flexibility changing wiring, makes checking the wiring easier and significantly
- * reduces the number of magic numbers floating around.
+ * The RobotMap is a mapping from the ports sensors and actuators are wired into
+ * to a variable name. This provides flexibility changing wiring, makes checking
+ * the wiring easier and significantly reduces the number of magic numbers
+ * floating around.
  */
 public class RobotMap {
   
@@ -16,6 +19,10 @@ public static int leftMaster = 1;
   public static int rightMaster = 3;
   public static int rightFollower= 4;
   public static int joystickPort = 0;
+
+  public static final int Motor_Shooter_1 = 5;
+  public static final int Motor_Shooter_2 = 6;
+  
 
   // For example to map the left and right motors, you could define the
   // following variables to use with your drivetrain subsystem.
