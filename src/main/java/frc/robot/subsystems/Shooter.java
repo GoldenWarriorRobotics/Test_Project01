@@ -20,6 +20,7 @@ public class Shooter extends Subsystem {
     @Override
     protected void initDefaultCommand() {
         //leave empty
+        //check code push
     }
     
     public void setShooterMotors (double speed) {
