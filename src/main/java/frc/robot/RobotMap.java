@@ -20,8 +20,10 @@ public static int leftMaster = 1;
   public static int rightFollower= 4;
   public static int joystickPort = 0;
 
-  public static final int Motor_Shooter_1 = 5;
-  public static final int Motor_Shooter_2 = 6;
+  public static final int Motor_Intake_1 = 5;
+
+  public static final int Motor_Shooter_1 = 6;
+  public static final int Motor_Shooter_2 = 10;
   
 
   // For example to map the left and right motors, you could define the

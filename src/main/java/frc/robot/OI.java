@@ -32,10 +32,11 @@ public class OI {
 // Button button = new JoystickButton(stick, 2);
 public OI(){
   stick = new Joystick(RobotMap.joystickPort);
-  IntakeIn = new JoystickButton(stick,2);
+  IntakeIn = new JoystickButton(stick, 9);
   IntakeIn.whileHeld(new IntakeIn());
-  Shoot = new JoystickButton(stick, 3);
-  Shoot.whileHeld(new Shoot());
+  Shoot = new JoystickButton(stick, 10);
+  System.out.println("Calling Shoot");
+  Shoot.whileHeld(new Shoot(7));
 }
 
 

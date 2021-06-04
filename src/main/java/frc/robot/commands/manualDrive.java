@@ -22,7 +22,7 @@ public class manualDrive extends Command {
   protected void execute() {
     double move = -1 * Robot.m_oi.stick.getY();
     double turn = Robot.m_oi.stick.getX();
-    Robot.driveTrain.manualDrive(move, turn);
+    Robot.driveTrain.manualDrive(move, -turn);
   }
 
   // Make this return true when this Command no longer needs to run execute()

@@ -7,22 +7,18 @@ import frc.robot.Robot;
 
 public class Shoot extends Command {
 
-    private int m_time;
-    private double m_speed;
+    private double m_time;
 
-    public Shoot () {
-        requires(Robot.shooter);
-    }
-    
-    public Shoot (int time, double speed) {
+    public Shoot (double time) {
         m_time = time;
-        m_speed = speed;
+        System.out.println("Shooter Constructor");
         requires(Robot.shooter);
     }
 
     @Override
     protected void initialize() {
-        Robot.shooter.setShooterMotors(m_speed);
+        Robot.shooter.setShooterMotors(.75);
+        System.out.println("Shooter Init");
         setTimeout(m_time);
     }
 
@@ -30,12 +26,20 @@ public class Shoot extends Command {
     protected void execute() {}
 
     @Override
-    protected boolean isFinished() {        
+    protected boolean isFinished() {
+        System.out.println("Shooter Finish");
+        while(true) {
+            if(isTimedOut()) {
+                end();
+                break;
+            }
+        }
         return isTimedOut();
     }
     
     @Override
     protected void end() {
+        //System.out .println("Shooter End");
         Robot.motorShooter1.set(ControlMode.PercentOutput, 0.0);
         Robot.motorShooter2.set(ControlMode.PercentOutput, 0.0);
     }

@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import edu.wpi.first.cameraserver.CameraServer;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -49,26 +50,19 @@ public class Robot extends TimedRobot {
   private static CANSparkMaxLowLevel motorLeft2 = new CANSparkMax(RobotMap.leftFollower, MotorType.kBrushed);
   private static CANSparkMaxLowLevel motorRight1 = new CANSparkMax(RobotMap.rightMaster, MotorType.kBrushed);
   private static CANSparkMaxLowLevel motorRight2 = new CANSparkMax(RobotMap.rightFollower, MotorType.kBrushed);
-
-  //private CANEncoder m_encoder;
- // private CANEncoder m_encoder2;
-  private Encoder encoder  = new Encoder(0,1,true,EncodingType.k1X);
-  
-
-  private final double kDriveTick2Feet = 1.0/4096*6*Math.PI/12;
-  
-
-  public Joystick stick; 
- 
-  
-  
- 
   public static DriveTrain driveTrain = new DriveTrain();
 
   public static VictorSPX motorShooter1 = new VictorSPX(RobotMap.Motor_Shooter_1);
   public static VictorSPX motorShooter2 = new VictorSPX(RobotMap.Motor_Shooter_2);
   public static Shooter shooter = new Shooter(motorShooter1, motorShooter2);
-  
+
+  private Encoder encoder  = new Encoder(0,1,true,EncodingType.k1X);
+  private final double kDriveTick2Feet = 1.0/4096*6*Math.PI/12;
+  //private CANEncoder m_encoder;
+ // private CANEncoder m_encoder2;  
+
+  public Joystick stick;
+
   public static OI m_oi;
 
   /**public Command getAutonomousCommand() {
@@ -87,6 +81,7 @@ public class Robot extends TimedRobot {
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
   public static frc.robot.subsystems.Intake Intake = new frc.robot.subsystems.Intake();
+
  // private double startTime;
 
   /**
@@ -99,6 +94,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
+    CameraServer.getInstance().startAutomaticCapture();
    // motorLeft1 = new CANSparkMax(RobotMap.leftMaster, MotorType.kBrushed);
     //motorRight1 = new CANSparkMax(RobotMap.rightMaster, MotorType.kBrushed);
     
@@ -159,7 +155,7 @@ public class Robot extends TimedRobot {
     lastError =0;
 
     // ok motorLeft1.restoreFactoryDefaults();
-  // ok  motorRight2.restoreFactoryDefaults();
+    // ok  motorRight2.restoreFactoryDefaults();
     //Container.getAutonomousCommand().schedule();
    // .set(.3);
 
@@ -171,15 +167,15 @@ public class Robot extends TimedRobot {
      */
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.start();
-    }
+    //if (m_autonomousCommand != null) {
+      //m_autonomousCommand.start();
+    //}
   }
   double setPoint =0;
   double errorSum = 0;
   double lastTimeStamp = 0;
   final  double kP = 0.05;
-  final double kI = 0;
+  final double kI = 0.5;
   final double iLimit = 1;
   final double kD = 0.01;
    double lastError =0;
@@ -187,12 +183,13 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if(stick.getRawButton(1)) {
+    //if(stick.getRawButton(7)) {
       setPoint = 10;
-    }else if (stick.getRawButton(2)){
+    //} else if (stick.getRawButton(8)) {
       setPoint = 0;
-    }
+    //}
     //get sensor posistion
+
     double sensorPosition =encoder.get() * kDriveTick2Feet;
 
     //calculations
@@ -207,10 +204,12 @@ public class Robot extends TimedRobot {
     double errorRate = (error - lastError) / dt;
     double outSpeed = kP * error +kI * errorSum +kD *errorRate;
     //output to motors
-    motorLeft1.set(outputSpeed);
-    motorLeft2.set(outputSpeed);
-    motorRight1.set(-outputSpeed);
-    motorRight2.set(-outputSpeed); 
+    motorLeft1.set(outSpeed);
+    motorLeft2.set(outSpeed);
+    motorRight1.set(-outSpeed);
+    motorRight2.set(-outSpeed); 
+
+    //update last- variables
     lastTimeStamp = Timer.getFPGATimestamp();
     lastError = error;
   }
